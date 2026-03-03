@@ -1,12 +1,12 @@
 name: Build APK
-on: [push, workflow_dispatch] # workflow_dispatch para ó bele klik butaun Run manuál
+on: [push, workflow_dispatch]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4 # Uza v4
+        uses: actions/checkout@v4
 
       - name: Build with Buildozer
         uses: ArtemSerebriakov/buildozer-action@v1
@@ -15,7 +15,7 @@ jobs:
           command: buildozer android debug
 
       - name: Upload APK
-        uses: actions/upload-artifact@v4 # Uza v4
+        uses: actions/upload-artifact@v4
         with:
           name: package
           path: bin/*.apk
